@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import Header from "./components/Header";
 import Index from "./components/Index";
 import Home from "./components/Home";
 import Myprojects from "./components/Myprojects";
@@ -13,7 +12,6 @@ import Leaves from "./components/Leaves";
 
 const App=()=>{
   return (<>
-    {/* <Index /> */}
     
     <BrowserRouter >
       <Routes>
