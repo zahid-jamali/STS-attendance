@@ -63,6 +63,13 @@ const Home = () => {
         }
     }
 
+    const distancer=()=>{
+        if (loc) {
+            const dist = L.latLng(fixedLoc).distanceTo(loc);
+            setDistance(dist.toFixed(2));
+        }
+    }
+
     
 
     useEffect(() => {
@@ -84,10 +91,7 @@ const Home = () => {
                 },
                 (error) => console.error("Error getting location:", error)
             );
-            if (loc) {
-                const dist = L.latLng(fixedLoc).distanceTo(loc);
-                setDistance(dist.toFixed(2));
-            }
+            distancer();
         }
     }, [navigate]);
 
