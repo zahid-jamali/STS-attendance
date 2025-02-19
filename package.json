@@ -16,8 +16,10 @@
     "sweetalert2": "^11.16.0"
   },
   "scripts": {
-    "build": "ESLINT_NO_DEV_ERRORS=true react-scripts build"
-  },
+    "build": "react-scripts build && CI=false",
+    "start": "react-scripts start"
+  }
+
 
   "eslintConfig": {
     "extends": [
