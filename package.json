@@ -18,7 +18,7 @@
   "scripts": {
     "build": "react-scripts build && CI=false",
     "start": "react-scripts start"
-  }
+  },
 
 
   "eslintConfig": {
