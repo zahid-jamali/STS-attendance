@@ -84,6 +84,10 @@ const Home = () => {
                 },
                 (error) => console.error("Error getting location:", error)
             );
+            if (loc) {
+                const dist = L.latLng(fixedLoc).distanceTo(loc);
+                setDistance(dist.toFixed(2));
+            }
         }
     }, [navigate]);
 
@@ -93,12 +97,7 @@ const Home = () => {
         }
     }, [user])
 
-    useEffect(() => {
-        if (loc) {
-            const dist = L.latLng(fixedLoc).distanceTo(loc);
-            setDistance(dist.toFixed(2));
-        }
-    }, [loc]);
+
 
     return (
         <>
