@@ -110,29 +110,3 @@ export default AdminDashboard;
 //   { name: "Jun", users: 239, sales: 380 },
 //   { name: "Jul", users: 349, sales: 430 },
 // ];
-{/* <div className="row">
-  <div className="col-md-6">
-    <div className="card p-3 shadow-sm">
-      <h3 className="card-title">User Growth</h3>
-      <LineChart width={400} height={250} data={data}>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-        <Line type="monotone" dataKey="users" stroke="#8884d8" />
-      </LineChart>
-    </div>
-  </div>
-  <div className="col-md-6">
-    <div className="card p-3 shadow-sm">
-      <h3 className="card-title">Sales Report</h3>
-      <BarChart width={400} height={250} data={data}>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-        <Bar dataKey="sales" fill="#82ca9d" />
-      </BarChart>
-    </div>
-  </div>
-</div> */}

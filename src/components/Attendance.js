@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
 
 const Attendance = () => {
     const [user, setUser] = useState(null);
@@ -16,7 +17,7 @@ const Attendance = () => {
 
     const navigate = useNavigate();
 
-    const getAttendance = async (userId) => {
+    const getAttendance = useCallback(async(userId) => {
         if (!userId) return; // Prevent calling API if userId is missing
 
         try {
@@ -41,7 +42,7 @@ const Attendance = () => {
         } catch (error) {
             console.error("Error fetching attendance:", error);
         }
-    };
+    }, [endingDate, startingDate]);
 
     useEffect(() => {
         const usr = localStorage.getItem("user");
@@ -52,7 +53,7 @@ const Attendance = () => {
             setUser(tmp);
             getAttendance(tmp._id);
         }
-    }, [navigate]);
+    }, [navigate, getAttendance]);
 
     return (
         <>

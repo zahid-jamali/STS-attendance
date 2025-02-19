@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Modal, Button, Form, Table } from "react-bootstrap";
 
 const ManageLeaves = () => {
-    const navigate = useNavigate();
     const [leaves, setLeaves] = useState([]);
     const [holidays, setHolidays] = useState([]);
     const [showModal, setShowModal] = useState(false);

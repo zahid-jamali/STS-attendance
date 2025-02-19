@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const MyProjects = () => {
-    const [user, setUser] = useState(null);
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -37,7 +36,6 @@ const MyProjects = () => {
             navigate("/login");
         } else {
             let tmp = JSON.parse(usr);
-            setUser(tmp);
             getProjects(tmp._id);
         }
     }, [navigate]);

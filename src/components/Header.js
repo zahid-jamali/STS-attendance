@@ -20,9 +20,9 @@ const Header = () => {
     <nav className="navbar navbar-expand-lg" style={{ backgroundColor: "#e3f2fd" }}>
       <div className="container-fluid">
         {/* Brand Name (Left Side) */}
-        <a className="navbar-brand h1 mb-0" href="#">
+        <span className="navbar-brand h1 mb-0" >
           Sindh Tech Solutions
-        </a>
+        </span>
 
         {/* Show Menu Only If Logged In */}
         {loggedIn && (

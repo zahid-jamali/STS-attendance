@@ -22,7 +22,11 @@ const ManageComplains=()=>{
                     <th>Description</th>
                     <th>Action</th>
                 </tr>
-                
+                {records.map((R)=>(<tr>
+                    <td>{R.Title}</td>
+                    <td>{R.Description}</td>
+                    <td>{R.Status}</td>
+                </tr>))}
             </table>
 
         </>

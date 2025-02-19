@@ -98,7 +98,7 @@ const Home = () => {
             const dist = L.latLng(fixedLoc).distanceTo(loc);
             setDistance(dist.toFixed(2));
         }
-    }, [loc]);
+    }, [loc, fixedLoc]);
 
     return (
         <>

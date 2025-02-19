@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "react-bootstrap";
 const Complains = () => {
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");

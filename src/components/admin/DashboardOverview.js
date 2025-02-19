@@ -40,7 +40,7 @@ const DashboardOverview = () => {
 
     useEffect(() => {
         handleRequest(inputDate);
-    }, []);
+    }, [inputDate, ]);
 
     return (
         <>

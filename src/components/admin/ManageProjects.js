@@ -41,7 +41,7 @@ useEffect(()=>{
 }, [])
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showWorkModal, setShowWorkModal] = useState(false);
+  const [showWorkModal, setShowWorkModal]=useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
 
   const handleEditClick = (project) => {
@@ -93,6 +93,7 @@ useEffect(()=>{
         </tbody>
       </Table>
 
+          {JSON.parse(showWorkModal)}
       {/* Edit Project Modal */}
       <Modal show={showEditModal} onHide={handleClose}>
         <Modal.Header closeButton>
