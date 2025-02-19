@@ -1,21 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const DashboardOverview = () => {
     const [records, setRecords] = useState([]);
     const [inputDate, setInputDate] = useState(new Date().toISOString().split("T")[0]);
-
 
     const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split("-");
         return `${month}-${day}-${year}`;
     };
 
-
-
-
-
-
-    const handleRequest = async (date) => {
+    const handleRequest = useCallback(async (date) => {
         const formattedDate = formatDate(date);
 
         try {
@@ -36,18 +30,18 @@ const DashboardOverview = () => {
         } catch (error) {
             console.error("Error fetching attendance:", error);
         }
-    };
+    }, []);
 
     useEffect(() => {
         handleRequest(inputDate);
-    }, [inputDate, ]);
+    }, [inputDate, handleRequest]);
 
     return (
         <>
             <h2 align="center">Dashboard</h2>
             <h3>Attendance</h3>
-                <input type="date" onChange={(e) => setInputDate(e.target.value)} />
-                <button className="btn btn-primary m-5" onClick={()=>handleRequest(inputDate)}>Check</button>
+            <input type="date" onChange={(e) => setInputDate(e.target.value)} />
+            <button className="btn btn-primary m-5" onClick={() => handleRequest(inputDate)}>Check</button>
             {inputDate}
             <table border="1" width="100%" cellPadding="10">
                 <thead>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 
 const Home = () => {
     const [loc, setLoc] = useState(null);
-    const fixedLoc = [26.25219994915647, 68.3927160944268];
+    const fixedLoc = useMemo(()=>[26.25219994915647, 68.3927160944268], []) ;
     const [distance, setDistance] = useState(100);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
