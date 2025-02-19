@@ -159,7 +159,6 @@ const CreateProject = () => {
                     <input type="checkbox" className="form-check-input" id="is_admin" checked={is_active} onChange={(e) => setIsActive(e.target.checked)} />
                     <label className="form-check-label" htmlFor="is_admin">Activate it</label>
                 </div>
-                {JSON.stringify(is_active)}
                 <div className="mt-4 text-center">
                     <button className="btn btn-success" onClick={handleRequest}>Create Project</button>
                 </div>
