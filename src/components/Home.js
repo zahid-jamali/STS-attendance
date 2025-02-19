@@ -103,7 +103,7 @@ const Home = () => {
         <>
             <Header />
             <div className="container mt-4">
-                <h2 className="text-center mb-4">📍 Attendance System</h2>
+                <h2 className="text-center mb-4">📍 Attendance Manager</h2>
 
                 {loc && (
                     <div className="row justify-content-center mb-4">
