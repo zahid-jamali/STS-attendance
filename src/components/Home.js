@@ -89,7 +89,6 @@ const Home = () => {
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     setLoc([latitude, longitude]);
-                    setFlag(false);
                 },
                 (error) => console.error("Error getting location:", error)
             );
