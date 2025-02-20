@@ -8,15 +8,37 @@ import Swal from "sweetalert2";
 
 const Home = () => {
     const [loc, setLoc] = useState(null);
-    const fixedLoc = useMemo(()=>[26.25219994915647, 68.3927160944268], []) ;
+    const fixedLoc = useMemo(() => [26.25219994915647, 68.3927160944268], []);
     const [distance, setDistance] = useState(100);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [projects, setProjects]=useState([]);
-    const [selectedProject, setSelectedProject]=useState();
-    const [works, setWorks]=useState();
+    const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState("");
+    const [works, setWorks] = useState("");
 
+    // Function to get user's projects
+    const getProjects = async (userId) => {
+        if (!userId) return;
+        try {
+            const req = await fetch(`${process.env.REACT_APP_API_URLS}/get-my-projects`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user: userId }),
+            });
+            const data = await req.json();
+            if (req.ok) {
+                setProjects(data.projects || []);
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+        }
+    };
+
+    // Function to mark entry
     const markEntry = async () => {
+        if (!user) return;
         try {
             const req = await fetch(`${process.env.REACT_APP_API_URLS}/entry`, {
                 method: "POST",
@@ -30,15 +52,16 @@ const Home = () => {
         }
     };
 
+    // Function to mark exit
     const markExit = async () => {
-        if(!selectedProject || !works){
-            return alert(`Please show you work `);
+        if (!selectedProject || !works) {
+            return Swal.fire("Warning", "Please select a project and describe your work.", "warning");
         }
         try {
             const req = await fetch(`${process.env.REACT_APP_API_URLS}/exit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user._id , projectId:selectedProject, works:works}),
+                body: JSON.stringify({ userId: user._id, projectId: selectedProject, works }),
             });
             const data = await req.json();
             Swal.fire("Exit Marked!", data.message, "success");
@@ -47,61 +70,40 @@ const Home = () => {
         }
     };
 
-    const getProjects=async (userId)=>{
-        if(!userId) return;
-        let req=await fetch(`${process.env.REACT_APP_API_URLS}/get-my-projects`, {
-            method:"POST",
-            headers:{"Content-type":"application/json"},
-            body:JSON.stringify({user: userId})
-        })
-        let data=await req.json();
-        if(req.ok){
-            setProjects(data);
-        }
-        else{
-            alert(data.message);
-        }
-    }
-
-    const distancer=()=>{
-        if (loc) {
-            const dist = L.latLng(fixedLoc).distanceTo(loc);
-            setDistance(dist.toFixed(2));
-        }
-    }
-
-    
-
+    // Effect to handle user authentication and fetch projects
     useEffect(() => {
         const usr = localStorage.getItem("user");
         if (!usr) {
             navigate("/login");
         } else {
-            let tmp=JSON.parse(usr)
+            const tmp = JSON.parse(usr);
             setUser(tmp);
             getProjects(tmp._id);
         }
-       
+    }, [navigate]);
 
+    // Effect to track location updates and update state
+    useEffect(() => {
         if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(
+            const geoWatch = navigator.geolocation.watchPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     setLoc([latitude, longitude]);
+                    setFlag(false);
                 },
                 (error) => console.error("Error getting location:", error)
             );
-            distancer();
+            return () => navigator.geolocation.clearWatch(geoWatch);
         }
-    }, [navigate]);
+    }, []);
 
-    useEffect(()=>{
-        if(user){
-            getProjects();
+    // Effect to update distance when location changes
+    useEffect(() => {
+        if (loc) {
+            const dist = L.latLng(fixedLoc).distanceTo(loc);
+            setDistance(dist.toFixed(2));
         }
-    }, [user])
-
-
+    }, [loc, fixedLoc]);
 
     return (
         <>
@@ -126,23 +128,18 @@ const Home = () => {
                 )}
 
                 <div className="text-center">
-                    {/* <p className="lead">
-                        <strong>Distance:</strong> {distance ? `${distance} meters` : "Calculating..."}
-                    </p> */}
-
                     {distance <= 50 ? (
                         <div className="card p-4 shadow-lg mx-auto" style={{ maxWidth: "600px" }}>
                             <h4 className="text-success">✅ You are at the required location</h4>
                             <div className="d-flex flex-column align-items-center gap-3 mt-3">
                                 <button className="btn btn-success w-100" onClick={markEntry}>Commit Entry</button>
-                                <select className="form-select w-100" onChange={(e)=>setSelectedProject(e.target.value)}>
-                                    <option value="" >Select a project</option>
-                                    {Array.isArray(projects.projects) && projects.projects.map((p) => (
+                                <select className="form-select w-100" onChange={(e) => setSelectedProject(e.target.value)} value={selectedProject}>
+                                    <option value="">Select a project</option>
+                                    {Array.isArray(projects) && projects.map((p) => (
                                         <option key={p._id} value={p._id}>{p.Title}</option>
                                     ))}
                                 </select>
-                                {/* {JSON.stringify(projects)} */}
-                                <textarea className="form-control" placeholder="What did you do today?" rows="3" onChange={(e)=>setWorks(e.target.value)}></textarea>
+                                <textarea className="form-control" placeholder="What did you do today?" rows="3" onChange={(e) => setWorks(e.target.value)} value={works}></textarea>
                                 <button className="btn btn-danger w-100" onClick={markExit}>Mark Exit</button>
                             </div>
                         </div>
