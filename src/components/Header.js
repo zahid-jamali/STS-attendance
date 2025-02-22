@@ -71,6 +71,9 @@ const Header = () => {
                     Logout
                   </button>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/admin"><b><u>Admin</u></b></Link>
+                </li>
               </ul>
             </div>
           </>

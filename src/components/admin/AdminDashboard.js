@@ -6,6 +6,7 @@ import CreateProject from "./CreateProject";
 import ManageLeaves from "./ManageLeaves";
 import ManageProjects from "./ManageProjects";
 import ManageComplains from "./ManageComplains";
+import ManageUsers from "./MangeUsers";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const AdminDashboard = () => {
             </li>
 
             <li className="nav-item">
-              <NavLink to="/admin/" className="nav-link text-white">Manage Users</NavLink>
+              <NavLink to="/admin/manage-users" className="nav-link text-white">Manage Users</NavLink>
             </li>
 
             <li className="nav-item">
@@ -66,12 +67,15 @@ const AdminDashboard = () => {
             <li className="nav-item">
               <button className="nav-link text-white" onClick={logout}>Logout</button>
             </li>
+            <li className="nav-item">
+              <NavLink to="/" className="nav-link text-white"> <b><u>Home</u></b></NavLink>
+            </li>
           </ul>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="flex-grow-1 d-flex flex-column" style={{ border: "1px solid #ccc", padding: "10px" }}>
+      <div className="flex-grow-1 d-flex flex-column" style={{padding: "10px" }}>
         {/* Navbar */}
         <nav className="navbar navbar-light bg-light d-flex justify-content-between">
           {!sidebarOpen && (
@@ -89,6 +93,7 @@ const AdminDashboard = () => {
             <Route path="/manage-leaves" element={<ManageLeaves />} />
             <Route path="/manage-projects" element={<ManageProjects />} />
             <Route path="/manage-complains" element={<ManageComplains />} />
+            <Route path="/manage-users" element={<ManageUsers />} />
             {/* Default Route */}
           </Routes>
         </div>

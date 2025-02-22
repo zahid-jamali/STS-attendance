@@ -3,6 +3,10 @@ import { useEffect, useState, useCallback } from "react";
 const DashboardOverview = () => {
     const [records, setRecords] = useState([]);
     const [inputDate, setInputDate] = useState(new Date().toISOString().split("T")[0]);
+    const [startingDate, setStartingDate]=useState();
+    const [endingDate, setEndingDate]=useState();
+    const [flag, setFlag]=useState(false);
+    const [data, setData]=useState([]);
 
     const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split("-");
@@ -13,7 +17,7 @@ const DashboardOverview = () => {
         const formattedDate = formatDate(date);
 
         try {
-            const req = await fetch(`${process.env.REACT_APP_API_URLS}/getUsersAttendanceByDate`, {
+            let req = await fetch(`${process.env.REACT_APP_API_URLS}/getUsersAttendanceByDate`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -32,6 +36,29 @@ const DashboardOverview = () => {
         }
     }, []);
 
+
+    const handleStaringAndEndDate=async()=>{
+        setFlag(true);
+        let req=await fetch(`${process.env.REACT_APP_API_URLS}/getUserAttendance`, {
+            method:"POST",
+            headers:{
+                "Content-type":"application/json",
+            },
+            body:JSON.stringify({
+                startingDate: startingDate ,
+                endingDate:endingDate,
+            })
+        })
+        if(req.ok){
+            let tmp=await req.json();
+            setData(tmp)
+        }
+        else{
+            alert("else block")
+        }
+        alert("status:",req.status)
+    }
+
     useEffect(() => {
         handleRequest(inputDate);
     }, [inputDate, handleRequest]);
@@ -39,55 +66,83 @@ const DashboardOverview = () => {
     return (
         <>
             <h2 align="center">Dashboard</h2>
-            <h3>Attendance</h3>
-            <input type="date" onChange={(e) => setInputDate(e.target.value)} />
-            <button className="btn btn-primary m-5" onClick={() => handleRequest(inputDate)}>Check</button>
-            {inputDate}
-            <table border="1" width="100%" cellPadding="10">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Entry Time</th>
-                        <th>Exit Time</th>
-                        <th>Work Hours</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {records.map((rec) => {
-                        const attendance = rec.attendanceRecords; // Can be an object or null
+            <div className="card p-4 shadow">
+                <h3 className="text-secondary">Attendance</h3>
+                <p className="mb-2">Check attendance for a single date:</p>
+                <input className="form-control mb-3" type="date" onChange={(e) => { setInputDate(e.target.value); handleRequest(e.target.value); }} />
+                <p><strong>Selected Date:</strong> {inputDate}</p>
+                
+                <p className="mt-4">Check attendance for a date range:</p>
+                <label className="form-label">Starting Date:</label>
+                <input className="form-control mb-2" type="date" onChange={(e) => setStartingDate(formatDate(e.target.value))} />
+                <label className="form-label">Ending Date:</label>
+                <input className="form-control mb-3" type="date" onChange={(e) => setEndingDate(formatDate(e.target.value))} />
+                <button className="btn btn-primary w-100" onClick={handleStaringAndEndDate}>Check</button>
+            </div>
+            {/* <button className="btn btn-primary m-5" onClick={() => handleRequest(inputDate)}>Check</button> */}
+            {flag ? [...data.reverse(), ].map((R)=>
+            (<>
+                <h5 className="text-dark">Date: {R.date}</h5>
+                <DisplayRecord info={R.records} />
+            </>)) 
+            
+            : 
+            
+            (<>
+                <DisplayRecord info={records} />
+            </>)}
 
-                        return (
-                            <tr key={rec._id}>
-                                <td>{rec.Name || "Unknown"}</td>
-                                <td>
-                                    {attendance && attendance.entryTime
-                                        ? new Date(attendance.entryTime).toLocaleTimeString()
-                                        : "N/A"}
-                                </td>
-                                <td>
-                                    {attendance && attendance.exitTime
-                                        ? new Date(attendance.exitTime).toLocaleTimeString()
-                                        : "N/A"}
-                                </td>
-                                <td>
-                                    {attendance && attendance.workHours
-                                        ? attendance.workHours.toFixed(2)
-                                        : "N/A"}
-                                </td>
-
-                                <td>
-                                    {attendance && attendance.Remarks
-                                        ? attendance.Remarks
-                                        : "N/A"}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
         </>
     );
 };
 
 export default DashboardOverview;
+
+
+const DisplayRecord=(props)=>{
+    return(
+            <table border="1" width="100%" cellPadding="10">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Entry Time</th>
+                <th>Exit Time</th>
+                <th>Work Hours</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {props.info.map((rec) => {
+                const attendance = rec.attendanceRecords; // Can be an object or null
+
+                return (
+                    <tr key={rec._id}>
+                        <td>{rec.Name || rec.user.Name || "Unknown"}</td>
+                        <td>
+                            {attendance && attendance.entryTime
+                                ? new Date(attendance.entryTime).toLocaleTimeString()
+                                : (rec.entryTime ? rec.entryTime : "N/A")}
+                        </td>
+                        <td>
+                        {attendance && attendance.exitTime
+                                ? new Date(attendance.exitTime).toLocaleTimeString()
+                                : (rec.exitTime ? rec.exitTime : "N/A")}
+                        </td>
+                        <td>
+                        {attendance && attendance.workHours
+                                ? new Date(attendance.workHours).toLocaleTimeString()
+                                : (rec.workHours ? rec.workHours : "N/A")}
+                        </td>
+
+                        <td>
+                            {attendance && attendance.Remarks
+                                ? new Date(attendance.Remarks).toLocaleTimeString()
+                                : (rec.Remarks ? rec.Remarks : "N/A")}
+                        </td>
+                    </tr>
+                );
+            })}
+        </tbody>
+    </table>
+    )
+}
