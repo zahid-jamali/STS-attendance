@@ -7,6 +7,8 @@ import ManageLeaves from "./ManageLeaves";
 import ManageProjects from "./ManageProjects";
 import ManageComplains from "./ManageComplains";
 import ManageUsers from "./MangeUsers";
+import AdminLogs from "./AdminLogs";
+import ManageLearnings from "./ManageLearnings";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -57,11 +59,14 @@ const AdminDashboard = () => {
             </li>
 
             <li className="nav-item">
-              <NavLink to="/admin/" className="nav-link text-white">Manage Learnings</NavLink>
+              <NavLink to="/admin/manage-learnings" className="nav-link text-white">Manage Learnings</NavLink>
             </li>
 
             <li className="nav-item">
               <NavLink to="/admin/manage-complains" className="nav-link text-white"> Complains & Suggestions</NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/admin/admin-logs" className="nav-link text-white">Admin Logs</NavLink>
             </li>
 
             <li className="nav-item">
@@ -94,6 +99,8 @@ const AdminDashboard = () => {
             <Route path="/manage-projects" element={<ManageProjects />} />
             <Route path="/manage-complains" element={<ManageComplains />} />
             <Route path="/manage-users" element={<ManageUsers />} />
+            <Route path="/admin-logs" element={<AdminLogs />} />
+            <Route path="/manage-learnings" element={<ManageLearnings />} />
             {/* Default Route */}
           </Routes>
         </div>

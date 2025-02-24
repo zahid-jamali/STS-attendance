@@ -12,7 +12,7 @@ const AdminCreateAttendance = () => {
     // Open modal
     const openModal = () => setIsOpen(true);
 
-    // Close modal
+
     const closeModal = () => {
         setIsOpen(false);
         setMessage("");
@@ -22,7 +22,6 @@ const AdminCreateAttendance = () => {
         setExitTime("");
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -62,7 +61,7 @@ const AdminCreateAttendance = () => {
         }
     };
 
-    // Fetch Users from API
+    
     const getUsers = async () => {
         try {
             let response = await fetch(`${process.env.REACT_APP_API_URLS}/getAllUsers`);

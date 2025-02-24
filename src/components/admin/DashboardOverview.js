@@ -54,9 +54,8 @@ const DashboardOverview = () => {
             setData(tmp)
         }
         else{
-            alert("else block")
+            alert("Error occured, please refresh, if the issue persist, contact to developer!")
         }
-        alert("status:",req.status)
     }
 
     useEffect(() => {
@@ -121,23 +120,23 @@ const DisplayRecord=(props)=>{
                         <td>
                             {attendance && attendance.entryTime
                                 ? new Date(attendance.entryTime).toLocaleTimeString()
-                                : (rec.entryTime ? rec.entryTime : "N/A")}
+                                : (rec.entryTime ? new Date(rec.entryTime).toLocaleTimeString() : "N/A")}
                         </td>
                         <td>
                         {attendance && attendance.exitTime
                                 ? new Date(attendance.exitTime).toLocaleTimeString()
-                                : (rec.exitTime ? rec.exitTime : "N/A")}
+                                : (rec.exitTime ? new Date(rec.exitTime).toLocaleTimeString() : "N/A")}
                         </td>
                         <td>
                         {attendance && attendance.workHours
-                                ? new Date(attendance.workHours).toLocaleTimeString()
+                                ? new Date(attendance.workHours)
                                 : (rec.workHours ? rec.workHours : "N/A")}
                         </td>
 
                         <td>
                             {attendance && attendance.Remarks
-                                ? new Date(attendance.Remarks).toLocaleTimeString()
-                                : (rec.Remarks ? rec.Remarks : "N/A")}
+                                ? attendance.Remarks
+                                : (rec.Remarks ? rec.Remarks : "")}
                         </td>
                     </tr>
                 );
