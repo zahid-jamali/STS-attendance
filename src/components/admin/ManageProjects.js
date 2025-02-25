@@ -9,11 +9,15 @@ const ManageProjects = () => {
   const descRef=useRef();
   const typeRef=useRef();
   const deadlineRef = useRef();
+  const [is_active, setIs_active]=useState();
+  const [works, setWorks]=useState([]);
+  const [showWorksModel, setShowWorksModel]=useState(false);
 
 
 
   const handleUpdate=async (e)=>{
     e.preventDefault();
+    
     let req=await fetch(`${process.env.REACT_APP_API_URLS}/update-project`, {
       method:"PUT",
       headers:{
@@ -26,7 +30,7 @@ const ManageProjects = () => {
         type:typeRef.current.value,
         deadline: deadlineRef.current.value,
         team: selectedProject.Team,
-        is_active:selectedProject.is_Active
+        is_active: is_active
       })
     })
     if(req.ok){
@@ -35,8 +39,25 @@ const ManageProjects = () => {
     else{
       alert("Error occured");
     }
-    // getProjects();
+    getProjects();
     handleClose()
+  }
+
+
+  const getWorks=async()=>{
+    let req=await fetch(`${process.env.REACT_APP_API_URLS}/get-my-works`, {
+      method:"POST",
+      headers:{
+        "Content-type":"application/json",
+      },
+      body:JSON.stringify({
+        projectId: selectedProject._id,
+      })
+    });
+    if(req.ok){
+      let data=await req.json()
+      setWorks(data);
+    }
   }
 
   
@@ -72,15 +93,18 @@ const ManageProjects = () => {
 
   const handleClose = () => {
     setShowEditModal(false);
+    setShowWorksModel(false);
   };
 
-  const toggleProjectStatus = (projectId) => {
-    setRecords((prevRecords) =>
-      prevRecords.map((project) =>
-        project._id === projectId ? { ...project, is_Active: !project.is_Active } : project
-      )
-    );
+  const handleWorksClick = (project) => {
+    setSelectedProject(project);
+    setShowWorksModel(true)
+    getWorks()
   };
+
+
+
+
 
   const handleAddMember = () => {
     if (!selectedUser) return;
@@ -110,7 +134,7 @@ const ManageProjects = () => {
           </tr>
         </thead>
         <tbody>
-          {records.map((P) => (
+          {records.map((P) => {return (
             <tr key={P._id}>
               <td>{P.Title}</td>
               <td>{P.Description}</td>
@@ -122,9 +146,10 @@ const ManageProjects = () => {
               </td>
               <td>
                 <Button variant="primary" onClick={() => handleEditClick(P)}>Edit</Button>
+                <Button variant="primary" onClick={()=> handleWorksClick(P) }>Track</Button>
               </td>
             </tr>
-          ))}
+          )})}
         </tbody>
       </Table>
 
@@ -158,9 +183,9 @@ const ManageProjects = () => {
                   <div className="input-group">
                     <select className="form-select" onChange={(e) => setSelectedUser(e.target.value)}>
                       <option value="">Select a team member</option>
-                      {users.map((usr) => (
+                      {users.map((usr) => {return (
                         <option key={usr._id} value={usr._id}>{usr.Name}</option>
-                      ))}
+                      )})}
                     </select>
                     <button className="btn btn-primary" type="button" onClick={handleAddMember}>Add</button>
                   </div>
@@ -168,12 +193,12 @@ const ManageProjects = () => {
                 <div className="mt-3">
                   {selectedProject.Team.length > 0 ? (
                     <div className="d-flex flex-wrap gap-2">
-                      {selectedProject.Team.map((member) => (
+                      {selectedProject.Team.map((member) => {return (
                         <span key={member._id} className="badge bg-info p-2 m-1">
                           {member.Name} 
                           <button className="btn btn-sm btn-danger ms-2" onClick={() => handleRemoveMember(member._id)}>×</button>
                         </span>
-                      ))}
+                      )})}
                     </div>
                   ) : (
                     <p className="text-muted">No team members added</p>
@@ -183,16 +208,41 @@ const ManageProjects = () => {
                 <div className="mb-3">
                   <label htmlFor="type" className="form-label">Status</label>
                   <Form.Check 
-                  type="switch"
-                  id={`switch-${selectedProject._id}`}
-                  defaultChecked={true}
-                  onChange={() => toggleProjectStatus(selectedProject._id)}
-                />
+                    type="switch"
+                    id={`switch-${selectedProject._id}`}
+                    defaultChecked={selectedProject.is_Active} 
+                    onChange={(e) => setIs_active(e.target.checked)}
+                  />
                 </div>
                 <Button variant="primary" type="submit">Save Changes</Button>
               </form>
             </div>
           )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
+
+
+      <Modal show={showWorksModel} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Commits on project</Modal.Title>
+          {/* <h2>{selectedProject.Title}</h2> */}
+        </Modal.Header>
+        <Modal.Body>
+        {works.map((W)=>{return (
+            <div>
+                <h3>{W.User.Name}</h3>
+                <p>{W.Work}</p>
+                <small><i>{W.date}</i></small>
+
+            </div>
+        
+        )})}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>Close</Button>

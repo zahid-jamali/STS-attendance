@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 const Home = () => {
     const [loc, setLoc] = useState(null);
     const fixedLoc = useMemo(() => [26.25219994915647, 68.3927160944268], []);
-    const [distance, setDistance] = useState(100);
+    const [distance, setDistance] = useState(null);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [projects, setProjects] = useState([]);
@@ -144,7 +144,7 @@ const Home = () => {
                         </div>
                     ) : (
                         <div className="alert alert-danger mt-3" role="alert">
-                            ⚠️ Sorry, you are not at the required location.
+                            ⚠️ Sorry, you are not at the required location. {distance}
                         </div>
                     )}
                 </div>

@@ -30,7 +30,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="d-flex vh-100">
-      {/* Sidebar */}
       {sidebarOpen && (
         <div className="bg-dark text-white p-3" style={{ width: "250px" }}>
           <button className="btn btn-light mb-3" onClick={() => setSidebarOpen(false)}>Close</button>

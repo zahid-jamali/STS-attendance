@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Header from "./Header";
 import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
 
 const Attendance = () => {
     const [user, setUser] = useState(null);
     const [record, setRecord] = useState([]);
     
-    // Corrected date initialization
     let today = new Date();
     let monthBefore = new Date();
     monthBefore.setDate(today.getDate() - 30);
@@ -85,34 +83,36 @@ const Attendance = () => {
                     </div>
                 </div>
             </div>
+            
             <div className="container">
                 <table className="table table-bordered">
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Entry</th>
-                            <th>Exit time</th>
-                            <th>Work hours</th>
+                            <th>Entry Time</th>
+                            <th>Exit Time</th>
+                            <th>Work Hours</th>
                             <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
                     {record.length > 0 ? (
-                    [...record].reverse().map((R, index) => (
-                            <tr key={index}>
-                                <td>{R.date}</td>
-                                <td>{R.entryTime || "N/A"}</td>
-                                <td>{R.exitTime || "N/A"}</td>
-                                <td>{R.workHours || "N/A"}</td>
-                                <td>{R.Remarks || ""}</td>
-                            </tr>
-                        ))
+                        record.map((entry, index) => 
+                            entry.records.map((rec, recIndex) => (
+                                <tr key={`${index}-${recIndex}`}>
+                                    <td>{entry.date}</td>
+                                    <td>{rec.entryTime ? new Date(rec.entryTime).toLocaleTimeString() : "N/A"}</td>
+                                    <td>{rec.exitTime ? new Date(rec.exitTime).toLocaleTimeString() : "N/A"}</td>
+                                    <td>{rec.workHours ?? "N/A"}</td>
+                                    <td>{rec.Remarks || ""}</td>
+                                </tr>
+                            ))
+                        )
                     ) : (
                         <tr>
-                            <td colSpan="5" align="center">No records found</td>
+                            <td colSpan="6" align="center">No records found</td>
                         </tr>
                     )}
-
                     </tbody>
                 </table>
             </div>

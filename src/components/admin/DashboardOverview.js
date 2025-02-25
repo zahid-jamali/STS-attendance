@@ -98,50 +98,49 @@ const DashboardOverview = () => {
 export default DashboardOverview;
 
 
-const DisplayRecord=(props)=>{
-    return(
-            <table border="1" width="100%" cellPadding="10">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Entry Time</th>
-                <th>Exit Time</th>
-                <th>Work Hours</th>
-                <th>Remarks</th>
-            </tr>
-        </thead>
-        <tbody>
-            {props.info.map((rec) => {
-                const attendance = rec.attendanceRecords; // Can be an object or null
+const DisplayRecord = (props) => {
+    return (
+        <table border="1" width="100%" cellPadding="10">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Entry Time</th>
+                    <th>Exit Time</th>
+                    <th>Work Hours</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {props.info.map((rec) => {
+                    const attendance = rec.attendanceRecords; // Can be an object or null
 
-                return (
-                    <tr key={rec._id}>
-                        <td>{rec.Name || rec.user.Name || "Unknown"}</td>
-                        <td>
-                            {attendance && attendance.entryTime
-                                ? new Date(attendance.entryTime).toLocaleTimeString()
-                                : (rec.entryTime ? new Date(rec.entryTime).toLocaleTimeString() : "N/A")}
-                        </td>
-                        <td>
-                        {attendance && attendance.exitTime
-                                ? new Date(attendance.exitTime).toLocaleTimeString()
-                                : (rec.exitTime ? new Date(rec.exitTime).toLocaleTimeString() : "N/A")}
-                        </td>
-                        <td>
-                        {attendance && attendance.workHours
-                                ? new Date(attendance.workHours)
-                                : (rec.workHours ? rec.workHours : "N/A")}
-                        </td>
-
-                        <td>
-                            {attendance && attendance.Remarks
-                                ? attendance.Remarks
-                                : (rec.Remarks ? rec.Remarks : "")}
-                        </td>
-                    </tr>
-                );
-            })}
-        </tbody>
-    </table>
-    )
-}
+                    return (
+                        <tr key={rec._id}>
+                            <td>{rec.Name || rec.user?.Name || "Unknown"}</td>
+                            <td>
+                                {attendance && attendance.entryTime
+                                    ? new Date(attendance.entryTime).toLocaleTimeString()
+                                    : (rec.entryTime ? new Date(rec.entryTime).toLocaleTimeString() : "N/A")}
+                            </td>
+                            <td>
+                                {attendance && attendance.exitTime
+                                    ? new Date(attendance.exitTime).toLocaleTimeString()
+                                    : (rec.exitTime ? new Date(rec.exitTime).toLocaleTimeString() : "N/A")}
+                            </td>
+                            <td>
+                                {attendance && attendance.workHours
+                                    ? new Date(attendance.workHours).toLocaleTimeString() // Format workHours as a string
+                                    : (rec.workHours ? rec.workHours : "N/A")}
+                            </td>
+                            <td>
+                                {attendance && attendance.Remarks
+                                    ? attendance.Remarks
+                                    : (rec.Remarks ? rec.Remarks : "")}
+                            </td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
+};
