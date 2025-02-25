@@ -90,7 +90,12 @@ const Home = () => {
                     const { latitude, longitude } = position.coords;
                     setLoc([latitude, longitude]);
                 },
-                (error) => console.error("Error getting location:", error)
+                (error) => console.error("Error getting location:", error),
+                {
+                    enableHighAccuracy: true, // Enable high accuracy
+                    timeout: 5000, // Maximum time to wait for a location
+                    maximumAge: 0, // Do not use a cached position
+                }
             );
             return () => navigator.geolocation.clearWatch(geoWatch);
         }
