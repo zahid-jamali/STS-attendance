@@ -114,7 +114,7 @@ const Home = () => {
             <Header />
             <div className="container mt-4">
                 <h2 className="text-center mb-4">📍 Attendance Manager</h2>
-
+                {distance ? (<>
                 {loc && (
                     <div className="row justify-content-center mb-4">
                         <div className="col-md-6">
@@ -153,6 +153,12 @@ const Home = () => {
                         </div>
                     )}
                 </div>
+                
+                </>) : (<>
+                    <div className="alert alert-danger mt-3" role="alert">
+                            Calculating the Geo location ...
+                        </div>
+                </>)}
             </div>
         </>
     );
