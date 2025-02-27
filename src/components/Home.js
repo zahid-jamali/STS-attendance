@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 
 const Home = () => {
     const [loc, setLoc] = useState(null);
-    const fixedLoc = useMemo(() => [26.25219994915647, 68.3927160944268], []);
+    const fixedLoc = useMemo(() => [26.252137,68.392635], []);
     const [distance, setDistance] = useState(null);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
