@@ -16,31 +16,32 @@ const ManageProjects = () => {
   const typeRef = useRef();
   const deadlineRef = useRef();
 
-  // Fetch works whenever selectedProject changes
+
   useEffect(() => {
     if (selectedProject?._id) {
-      getWorks();
+      const getWorks = async () => {
+        setWorks([]);
+    
+        const projectId = selectedProject._id;
+        let req = await fetch(`${process.env.REACT_APP_API_URLS}/get-my-works`, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+          }),
+        });
+        if (req.ok) {
+          let data = await req.json();
+          setWorks(data);
+        }
+      };
+      getWorks()
     }
   }, [selectedProject]);
 
-  const getWorks = async () => {
-    setWorks([]);
-
-    const projectId = selectedProject._id;
-    let req = await fetch(`${process.env.REACT_APP_API_URLS}/get-my-works`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        projectId: projectId,
-      }),
-    });
-    if (req.ok) {
-      let data = await req.json();
-      setWorks(data);
-    }
-  };
+  
 
   const getProjects = async () => {
     let req = await fetch(`${process.env.REACT_APP_API_URLS}/get-all-projects`);
