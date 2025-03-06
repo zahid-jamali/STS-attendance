@@ -97,7 +97,7 @@ const Attendance = () => {
                     </thead>
                     <tbody>
                     {record.length > 0 ? (
-                        record.map((entry, index) => 
+                        [...record, ].reverse().map((entry, index) => 
                             entry.records.map((rec, recIndex) => (
                                 <tr key={`${index}-${recIndex}`}>
                                     <td>{entry.date}</td>

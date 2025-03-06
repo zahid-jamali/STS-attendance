@@ -15,6 +15,11 @@ const Home = () => {
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState("");
     const [works, setWorks] = useState("");
+    const [goal, setGoal]=useState();
+
+
+    
+
 
     // Function to get user's projects
     const getProjects = async (userId) => {
@@ -54,14 +59,14 @@ const Home = () => {
 
     // Function to mark exit
     const markExit = async () => {
-        if (!selectedProject || !works) {
+        if (!goal && !works) {
             return Swal.fire("Warning", "Please select a project and describe your work.", "warning");
         }
         try {
             const req = await fetch(`${process.env.REACT_APP_API_URLS}/exit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user._id, projectId: selectedProject, works }),
+                body: JSON.stringify({ userId: user._id, projectId: selectedProject, works, goal:goal }),
             });
             const data = await req.json();
             Swal.fire("Exit Marked!", data.message, "success");
@@ -143,6 +148,44 @@ const Home = () => {
                                         <option key={p._id} value={p._id}>{p.Title}</option>
                                     ))}
                                 </select>
+                                <select className="form-select w-100" onChange={(e) => setGoal(JSON.parse(e.target.value))}>
+                                    <option>Select the Goal</option>
+                                    {projects && selectedProject && projects.map((P) =>
+                                        P._id === selectedProject ? P.Goals.map((G) => (
+                                            <option key={G.Goal} value={JSON.stringify(G)}>
+                                                {G.Goal} 
+                                            </option>
+                                        )) : null
+                                    )}
+                                </select>
+                                {goal && (<>
+                                    <div className="w-100">
+                                        <label>Goal Progress</label>
+                                        <div className="progress" style={{ height: "30px" }}>
+                                            <div 
+                                                className="progress-bar progress-bar-striped progress-bar-animated" 
+                                                role="progressbar" 
+                                                style={{ width: `${goal.Status}%` }} 
+                                                aria-valuenow={goal.Status} 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100"
+                                            >
+                                                {goal.Status}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    { goal.Status>=100 ? (<p>Goal Achieved!</p>) : (<>
+                                        <input type="range" className="form-range mt-2"
+                                            min="0" max="100" step="1" 
+                                            value={goal.Status || 0} onChange={(e) =>  setGoal({ ...goal, Status: e.target.value })}
+                                        />
+                                    
+                                    </>) }
+                                
+                                
+                                </>)}
+
+                                
                                 <textarea className="form-control" placeholder="What did you do today?" rows="3" onChange={(e) => setWorks(e.target.value)} value={works}></textarea>
                                 <button className="btn btn-danger w-100" onClick={markExit}>Mark Exit</button>
                             </div>
