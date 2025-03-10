@@ -13,6 +13,22 @@ const ManageProjects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedUser, setSelectedUser] = useState('');
   const [is_active, setIs_active] = useState(false);
+  const [showTotalProjects, setShowTotalProjects] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState([]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    let projects = records.filter(
+      (P) =>
+        P.Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        P.Description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    if (searchQuery === '') {
+      return setFilteredProjects(records);
+    }
+    setFilteredProjects(projects);
+  };
 
   const titleRef = useRef();
   const descRef = useRef();
@@ -51,6 +67,7 @@ const ManageProjects = () => {
     if (req.ok) {
       let data = await req.json();
       setRecords(data);
+      setFilteredProjects(data);
     }
   };
 
@@ -150,6 +167,50 @@ const ManageProjects = () => {
   return (
     <>
       <h3 className="text-center my-4">Active Projects</h3>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        {/* Checkbox (Toggle Switch) on the Left */}
+        <div className="form-check form-switch">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="toggleSwitch"
+            checked={showTotalProjects}
+            onChange={(e) => setShowTotalProjects(e.target.checked)}
+            style={{ width: '3rem', height: '1.5rem' }} // Larger toggle switch
+          />
+          <label className="form-check-label ms-2" htmlFor="toggleSwitch">
+            <b>
+              Show Total Users <i>Inactive</i> Included
+            </b>
+          </label>
+        </div>
+
+        {/* Search Box on the Right */}
+        <div style={{ width: '300px' }}>
+          {' '}
+          {/* Controlled width for search box */}
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search Here..."
+            value={searchQuery}
+            onChange={handleSearch}
+            style={{
+              borderRadius: '25px', // Rounded corners
+              padding: '12px 20px', // Padding for height and width
+              fontSize: '16px', // Larger font size
+              border: '2px solid #ddd', // Light border
+              transition: 'border-color 0.3s ease', // Smooth transition
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#007bff'; // Highlight on focus
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#ddd'; // Reset on blur
+            }}
+          />
+        </div>
+      </div>
       <Table
         striped
         bordered
@@ -169,68 +230,143 @@ const ManageProjects = () => {
           </tr>
         </thead>
         <tbody>
-          {records.map((P) => (
-            <tr key={P._id}>
-              <td className="fw-bold">{P.Title}</td>
-              <td>{P.Description}</td>
-              <td>
-                {P.Team.map((U) => (
-                  <div key={U._id} className="badge bg-secondary me-1 mb-1">
-                    {U.Name}
-                  </div>
-                ))}
-              </td>
-              <td>{P.ProjectType}</td>
-              <td>{P.Deadline.split('T')[0]}</td>
-              <td>
-                <span
-                  className={`badge ${
-                    P.is_Active ? 'bg-success' : 'bg-danger'
-                  }`}
-                >
-                  {P.is_Active ? 'Active' : 'Closed'}
-                </span>
-              </td>
-              <td>
-                <div className="d-flex flex-column gap-2">
-                  <div className="d-flex gap-2">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => handleEditClick(P)}
+          {!showTotalProjects ? (
+            <>
+              {filteredProjects.map((P) =>
+                P.is_Active ? (
+                  <tr key={P._id}>
+                    <td className="fw-bold">{P.Title}</td>
+                    <td>{P.Description}</td>
+                    <td>
+                      {P.Team.map((U) => (
+                        <div
+                          key={U._id}
+                          className="badge bg-secondary me-1 mb-1"
+                        >
+                          {U.Name}
+                        </div>
+                      ))}
+                    </td>
+                    <td>{P.ProjectType}</td>
+                    <td>{P.Deadline.split('T')[0]}</td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          P.is_Active ? 'bg-success' : 'bg-danger'
+                        }`}
+                      >
+                        {P.is_Active ? 'Active' : 'Closed'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-flex flex-column gap-2">
+                        <div className="d-flex gap-2">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handleEditClick(P)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={() => handleWorksClick(P)}
+                          >
+                            Commits
+                          </Button>
+                        </div>
+                        <div className="d-flex gap-2">
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            onClick={() => handleAddGoalClick(P)}
+                          >
+                            Add Goal
+                          </Button>
+                          <Button
+                            variant="outline-info"
+                            size="sm"
+                            onClick={() => handleTrackGoalClick(P)}
+                          >
+                            Track Goals
+                          </Button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <></>
+                )
+              )}
+            </>
+          ) : (
+            <>
+              {filteredProjects.map((P) => (
+                <tr key={P._id}>
+                  <td className="fw-bold">{P.Title}</td>
+                  <td>{P.Description}</td>
+                  <td>
+                    {P.Team.map((U) => (
+                      <div key={U._id} className="badge bg-secondary me-1 mb-1">
+                        {U.Name}
+                      </div>
+                    ))}
+                  </td>
+                  <td>{P.ProjectType}</td>
+                  <td>{P.Deadline.split('T')[0]}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        P.is_Active ? 'bg-success' : 'bg-danger'
+                      }`}
                     >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline-success"
-                      size="sm"
-                      onClick={() => handleWorksClick(P)}
-                    >
-                      Commits
-                    </Button>
-                  </div>
-                  <div className="d-flex gap-2">
-                    <Button
-                      variant="outline-warning"
-                      size="sm"
-                      onClick={() => handleAddGoalClick(P)}
-                    >
-                      Add Goal
-                    </Button>
-                    <Button
-                      variant="outline-info"
-                      size="sm"
-                      onClick={() => handleTrackGoalClick(P)}
-                    >
-                      Track Goals
-                    </Button>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
+                      {P.is_Active ? 'Active' : 'Closed'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="d-flex flex-column gap-2">
+                      <div className="d-flex gap-2">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => handleEditClick(P)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          onClick={() => handleWorksClick(P)}
+                        >
+                          Commits
+                        </Button>
+                      </div>
+                      <div className="d-flex gap-2">
+                        <Button
+                          variant="outline-warning"
+                          size="sm"
+                          onClick={() => handleAddGoalClick(P)}
+                        >
+                          Add Goal
+                        </Button>
+                        <Button
+                          variant="outline-info"
+                          size="sm"
+                          onClick={() => handleTrackGoalClick(P)}
+                        >
+                          Track Goals
+                        </Button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </>
+          )}
         </tbody>
       </Table>
+
       <AddGoals
         project={selectedProject}
         showmodel={showAddModel}
