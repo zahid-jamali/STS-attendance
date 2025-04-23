@@ -1,0 +1,70 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .attendance-report-modal,
+  .attendance-report-modal * {
+    visibility: visible;
+  }
+
+  .attendance-report-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    overflow: visible !important;
+  }
+
+  .modal-content {
+    display: block !important;
+    position: relative;
+    height: auto;
+    min-height: 100%;
+    page-break-after: always;
+    overflow: visible !important;
+  }
+
+  table {
+    page-break-inside: auto;
+    border-collapse: collapse !important;
+    width: 100%;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  td {
+    page-break-inside: avoid;
+  }
+
+  .modal-backdrop,
+  .btn-close,
+  .modal-footer {
+    display: none !important;
+  }
+
+  .modal-header {
+    position: relative;
+    page-break-after: avoid;
+  }
+
+  .bg-primary,
+  .badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #ddd !important;
+  }
+}

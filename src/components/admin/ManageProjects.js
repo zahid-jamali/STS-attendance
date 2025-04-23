@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Table, Form, Card } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 import { AddGoals, TrackGoals } from './ManageGoals';
+import EditProjectModal from './sub-components/EditProjectModal';
+import WorksModal from './sub-components/WorksModal';
 
 const ManageProjects = () => {
   const [records, setRecords] = useState([]);
@@ -18,13 +20,14 @@ const ManageProjects = () => {
   const [filteredProjects, setFilteredProjects] = useState([]);
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    let projects = records.filter(
+    const value = e.target.value;
+    setSearchQuery(value);
+    const projects = records.filter(
       (P) =>
-        P.Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        P.Description.toLowerCase().includes(searchQuery.toLowerCase())
+        P.Title.toLowerCase().includes(value.toLowerCase()) ||
+        P.Description.toLowerCase().includes(value.toLowerCase())
     );
-    if (searchQuery === '') {
+    if (value === '') {
       return setFilteredProjects(records);
     }
     setFilteredProjects(projects);
@@ -366,7 +369,7 @@ const ManageProjects = () => {
           )}
         </tbody>
       </Table>
-
+      {/* This section of jsx is for the Goals and these components are in the manage goals  */}
       <AddGoals
         project={selectedProject}
         showmodel={showAddModel}
@@ -377,151 +380,33 @@ const ManageProjects = () => {
         showmodel={showTrackGoalsModel}
         handleclose={handleClose}
       />
+      {/* ----------------------------------------------------------------------------------------------------- */}
 
+      {/* The following code is in sub-components */}
       {/* Edit Project Modal */}
-      <Modal show={showEditModal} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Project</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedProject && (
-            <form onSubmit={handleUpdate}>
-              <div className="mb-3">
-                <label htmlFor="title" className="form-label">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  className="form-control"
-                  defaultValue={selectedProject.Title}
-                  ref={titleRef}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="description" className="form-label">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  className="form-control"
-                  rows="4"
-                  defaultValue={selectedProject.Description}
-                  ref={descRef}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="type" className="form-label">
-                  Type
-                </label>
-                <input
-                  type="text"
-                  id="type"
-                  className="form-control"
-                  defaultValue={selectedProject.ProjectType}
-                  ref={typeRef}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="deadline" className="form-label">
-                  Deadline
-                </label>
-                <input
-                  type="date"
-                  id="deadline"
-                  className="form-control"
-                  defaultValue={selectedProject.Deadline.split('T')[0]}
-                  ref={deadlineRef}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Team Members</label>
-                <div className="input-group">
-                  <select
-                    className="form-select"
-                    onChange={(e) => setSelectedUser(e.target.value)}
-                  >
-                    <option value="">Select a team member</option>
-                    {users.map((usr) => (
-                      <option key={usr._id} value={usr._id}>
-                        {usr.Name}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={handleAddMember}
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-              <div className="mt-3">
-                {selectedProject.Team.length > 0 ? (
-                  <div className="d-flex flex-wrap gap-2">
-                    {selectedProject.Team.map((member) => (
-                      <span key={member._id} className="badge bg-info p-2 m-1">
-                        {member.Name}
-                        <button
-                          className="btn btn-sm btn-danger ms-2"
-                          onClick={() => handleRemoveMember(member._id)}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted">No team members added</p>
-                )}
-              </div>
-              <div className="mb-3">
-                <label htmlFor="type" className="form-label">
-                  Status
-                </label>
-                <Form.Check
-                  type="switch"
-                  id={`switch-${selectedProject._id}`}
-                  defaultChecked={selectedProject.is_Active}
-                  onChange={(e) => setIs_active(e.target.checked)}
-                />
-              </div>
-              <Button variant="primary" type="submit">
-                Save Changes
-              </Button>
-            </form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <EditProjectModal
+        show={showEditModal}
+        handleClose={handleClose}
+        selectedProject={selectedProject}
+        users={users}
+        titleRef={titleRef}
+        descRef={descRef}
+        typeRef={typeRef}
+        deadlineRef={deadlineRef}
+        handleUpdate={handleUpdate}
+        handleAddMember={handleAddMember}
+        handleRemoveMember={handleRemoveMember}
+        setSelectedUser={setSelectedUser}
+        setIs_active={setIs_active}
+      />
 
       {/* Works Modal */}
-      <Modal show={showWorksModel} onHide={handleClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Commits on Project</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {works.map((W, index) => (
-            <Card key={index} className="mb-3 shadow-sm">
-              <Card.Body>
-                <h5 className="mb-1">{W.User.Name}</h5>
-                <p className="text-muted">{W.Work}</p>
-                <small className="text-secondary">{W.date}</small>
-              </Card.Body>
-            </Card>
-          ))}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+
+      <WorksModal
+        show={showWorksModel}
+        handleClose={handleClose}
+        works={works}
+      />
     </>
   );
 };

@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import './sub-components/manageUsers.report.css';
+import { useEffect, useState, useRef } from 'react';
 import AdminCreateAttendance from './AdminCreateAttendance';
-import { Modal, Button, Card } from 'react-bootstrap';
+import EditUserModal from './sub-components/editUserModal';
+import UserWorksModal from './sub-components/UserWorksModal';
+import AttendanceReportModal from './sub-components/AttendanceReportModal';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -24,13 +27,16 @@ const ManageUsers = () => {
   const newPasswordRef = useRef();
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    let Users = users.filter(
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    const Users = users.filter(
       (U) =>
-        U.Name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        U.Email.toLowerCase().includes(searchQuery.toLowerCase())
+        U.Name.toLowerCase().includes(query.toLowerCase()) ||
+        U.Email.toLowerCase().includes(query.toLowerCase())
     );
-    if (searchQuery === '') {
+
+    if (query === '') {
       return setFilteredUsers(users);
     }
     setFilteredUsers(Users);
@@ -74,38 +80,35 @@ const ManageUsers = () => {
     today.toISOString().split('T')[0]
   );
 
-  const getAttendance = useCallback(
-    async (userId) => {
-      if (!selectedUser) return;
+  const getAttendance = async (userId) => {
+    if (!userId) return;
 
-      try {
-        let req = await fetch(
-          `${process.env.REACT_APP_API_URLS}/getUserAttendance`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: selectedUser._id,
-              startingDate,
-              endingDate,
-            }),
-          }
-        );
-
-        if (req.ok) {
-          let data = await req.json();
-          setRecord(data);
-        } else {
-          console.error('Failed to fetch attendance');
+    try {
+      let req = await fetch(
+        `${process.env.REACT_APP_API_URLS}/getUserAttendance`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            startingDate,
+            endingDate,
+          }),
         }
-      } catch (error) {
-        console.error('Error fetching attendance:', error);
+      );
+
+      if (req.ok) {
+        let data = await req.json();
+        setRecord(data);
+      } else {
+        console.error('Failed to fetch attendance');
       }
-    },
-    [endingDate, startingDate, selectedUser]
-  );
+    } catch (error) {
+      console.error('Error fetching attendance:', error);
+    }
+  };
 
   useEffect(() => {
     if (showWorksModel) {
@@ -129,7 +132,7 @@ const ManageUsers = () => {
   const handleAttendanceClick = (user) => {
     setSelectedUser(user);
     setShowAttendanceModel(true);
-    getAttendance();
+    getAttendance(user._id);
   };
 
   const handleWorksClick = (user) => {
@@ -226,7 +229,20 @@ const ManageUsers = () => {
                 {filteredUsers.map((U) =>
                   U.is_Active ? (
                     <tr key={U.Email}>
-                      <td className="fw-bold">{U.Name}</td>
+                      <td className="fw-bold">
+                        {U.Name}
+                        {U.is_Admin ? (
+                          <span
+                            className="badge bg-primary ms-1"
+                            style={{ borderRadius: '50%', fontSize: '0.7rem' }}
+                            title="Verified Admin"
+                          >
+                            ✔
+                          </span>
+                        ) : (
+                          ''
+                        )}
+                      </td>
                       <td>{U.Email}</td>
                       <td>
                         <div className="d-flex flex-wrap justify-content-center gap-2">
@@ -251,6 +267,8 @@ const ManageUsers = () => {
                               <input
                                 type="date"
                                 className="form-control form-control-sm"
+                                key={startingDate}
+                                defaultValue={startingDate}
                                 onChange={(e) =>
                                   setStartingDate(e.target.value)
                                 }
@@ -269,7 +287,7 @@ const ManageUsers = () => {
                             className="btn btn-warning btn-sm px-3 mt-2"
                             onClick={() => handleAttendanceClick(U)}
                           >
-                            📅 Attendance
+                            📅 Attendance Report
                           </button>
                         </div>
                       </td>
@@ -335,230 +353,37 @@ const ManageUsers = () => {
           </table>
         </div>
       </div>
-
-      <Modal show={showEditModal} onHide={handleClose} centered>
-        <Modal.Header closeButton className="bg-primary text-white">
-          <Modal.Title>Edit User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedUser && (
-            <form onSubmit={updateUser}>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label htmlFor="name" className="form-label fw-bold">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    className="form-control"
-                    defaultValue={selectedUser.Name}
-                    placeholder="Enter name"
-                    ref={nameRef}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="email" className="form-label fw-bold">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="form-control"
-                    defaultValue={selectedUser.Email}
-                    placeholder="Enter email"
-                    ref={emailRef}
-                  />
-                </div>
-              </div>
-
-              <div className="row g-3 mt-2">
-                <div className="col-md-6">
-                  <label htmlFor="phone" className="form-label fw-bold">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    className="form-control"
-                    defaultValue={selectedUser.Phone}
-                    placeholder="Enter phone number"
-                    ref={phoneRef}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="roll" className="form-label fw-bold">
-                    Role
-                  </label>
-                  <input
-                    type="text"
-                    id="roll"
-                    className="form-control"
-                    defaultValue={selectedUser.Roll}
-                    placeholder="Enter role"
-                    ref={roleRef}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <label htmlFor="bio" className="form-label fw-bold">
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  className="form-control"
-                  rows="3"
-                  defaultValue={selectedUser.Bio}
-                  placeholder="Enter user bio"
-                  ref={bioRef}
-                ></textarea>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="form-check form-switch">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="isActiveSwitch"
-                    defaultChecked={selectedUser.is_Active}
-                    ref={activeRef}
-                  />
-                  <label
-                    className="form-check-label fw-bold ms-2"
-                    htmlFor="isActiveSwitch"
-                  >
-                    Is Active
-                  </label>
-                </div>
-                <div className="form-check form-switch">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="isAdminSwitch"
-                    defaultChecked={selectedUser.is_Admin}
-                    ref={adminRef}
-                  />
-                  <label
-                    className="form-check-label fw-bold ms-2"
-                    htmlFor="isAdminSwitch"
-                  >
-                    Is Admin
-                  </label>
-                </div>
-              </div>
-              <div className="row g-3 mt-2">
-                <div className="col-md-6">
-                  <label htmlFor="phone" className="form-label fw-bold">
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    className="form-control"
-                    placeholder="Password"
-                    ref={newPasswordRef}
-                  />
-                </div>
-              </div>
-
-              <button className="btn btn-primary w-100 mt-3" type="submit">
-                💾 Save Changes
-              </button>
-            </form>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showWorksModel} onHide={handleClose} centered>
-        <Modal.Header closeButton className="bg-primary text-white">
-          <Modal.Title>User Tracks</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {works.length > 0 ? (
-            works.map((W, index) => (
-              <Card key={index} className="mb-3 border-primary shadow-sm">
-                <Card.Body>
-                  <h5 className="fw-bold text-primary">{W.Project.Title}</h5>
-                  <p className="text-muted">{W.Work}</p>
-                  <small className="fst-italic text-secondary">{W.date}</small>
-                </Card.Body>
-              </Card>
-            ))
-          ) : (
-            <div className="text-center text-muted">
-              No work records available.
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showAttendanceModel} onHide={handleClose} centered>
-        <Modal.Header closeButton className="bg-primary text-white">
-          <Modal.Title>User Attendance</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="table-responsive">
-            <table className="table table-striped table-bordered table-hover">
-              <thead className="table-dark">
-                <tr>
-                  <th>Date</th>
-                  <th>Entry</th>
-                  <th>Exit</th>
-                  <th>Work Hours</th>
-                  <th>Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                {record.length > 0 ? (
-                  [...record].reverse().map((entry, index) =>
-                    entry.records.map((rec, recIndex) =>
-                      selectedUser._id === rec.user._id ? (
-                        <tr key={`${index}-${recIndex}`}>
-                          <td>{entry.date}</td>
-                          <td>
-                            {rec.entryTime
-                              ? new Date(rec.entryTime).toLocaleTimeString()
-                              : 'N/A'}
-                          </td>
-                          <td>
-                            {rec.exitTime
-                              ? new Date(rec.exitTime).toLocaleTimeString()
-                              : 'N/A'}
-                          </td>
-                          <td>{rec.workHours ?? 'N/A'}</td>
-                          <td>{rec.Remarks || '—'}</td>
-                        </tr>
-                      ) : null
-                    )
-                  )
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center text-muted">
-                      No records found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Edit User modal JSX Here  */}
+      <EditUserModal
+        show={showEditModal}
+        handleClose={handleClose}
+        selectedUser={selectedUser}
+        updateUser={updateUser}
+        nameRef={nameRef}
+        emailRef={emailRef}
+        phoneRef={phoneRef}
+        roleRef={roleRef}
+        bioRef={bioRef}
+        activeRef={activeRef}
+        adminRef={adminRef}
+        newPasswordRef={newPasswordRef}
+      />
+      {/* User Commits Modal Here  */}
+      <UserWorksModal
+        show={showWorksModel}
+        handleClose={handleClose}
+        works={works}
+      />
+      {/* Attendance Report Modal Here  */}
+      <AttendanceReportModal
+        show={showAttendanceModel}
+        handleClose={handleClose}
+        selectedUser={selectedUser}
+        record={record}
+        startingDate={startingDate}
+        endingDate={endingDate}
+      />
+      ;
     </>
   );
 };
